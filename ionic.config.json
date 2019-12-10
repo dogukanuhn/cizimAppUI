@@ -1,5 +1,7 @@
 {
   "name": "cizimApp",
-  "integrations": {},
+  "integrations": {
+    "cordova": {}
+  },
   "type": "angular"
 }

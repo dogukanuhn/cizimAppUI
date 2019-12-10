@@ -1,0 +1,22 @@
+<ion-header>
+    <ion-toolbar>
+      <ion-title>Oda Numarası : {{roomId}}</ion-title>
+      <ion-buttons slot="start">
+          <ion-back-button (click)="GoBack()" defaultHref="/"></ion-back-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+<ion-content>
+    <ul>
+      <li *ngFor="let item of chatMessage">{{item.username}}:{{item.message}}</li>
+    </ul>
+
+
+</ion-content>
+
+
+<ion-footer>
+    <ion-input placeholder="Mesajınız.." [(ngModel)]="messageText"></ion-input>
+    <ion-button (click)="SendMessage(messageText)">></ion-button>
+</ion-footer>

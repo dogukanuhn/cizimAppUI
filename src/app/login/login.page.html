@@ -1,0 +1,13 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+  <ion-input [(ngModel)]="username"></ion-input>
+  <ion-input [(ngModel)]="password"></ion-input>
+
+  <ion-button (click)="Login(username,password)">Giriş Yap</ion-button>
+</ion-content>
