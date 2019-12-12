@@ -12,7 +12,7 @@ import { UserService } from '../services/user.service';
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
 })
-export class HomePage implements OnInit {
+export class HomePage {
 
 
   constructor(private alertController: AlertController, public http: HttpClient,private router:Router,private socket:SocketService,private userS:UserService) {
@@ -28,35 +28,36 @@ export class HomePage implements OnInit {
   ionViewWillEnter() {
 
 
-      this.socket.connection.start().then(x=>{
-        this.socket.connection.on("SetConnectionId",x=>{
-          console.log(x);
-          this.http.post(this.apiUrl+"api/user/connect",{
-            Username:this.userS.userInformation['username'],
-            ConnectionId:x
-          },this.httpOptions).subscribe(x=>{})
-        })    
-    
+      if(this.socket.connection.state == signalR.HubConnectionState.Disconnected){
+        this.socket.connection.start().then(x=>{
+          this.socket.connection.on("SetConnectionId",x=>{
+            console.log(x);
+            this.http.post(this.apiUrl+"api/user/connect",{
+              Username:this.userS.userInformation['username'],
+              ConnectionId:x
+            },this.httpOptions).subscribe(x=>{})
+          })    
+          this.socket.connection.on("Notify",x=>{;
+            console.log(x);
+            this.liste = x
+          })
+          
+        });
+      }else if(this.socket.connection.state == signalR.HubConnectionState.Connected){
         this.socket.connection.on("Notify",x=>{;
+          console.log(x);
           this.liste = x
         })
-      });
+      }
       
     
   }
-
-  ionViewDidEnter() {
-   
-  }
-
 
   openRoom() {
 
     this.presentCreateRoom();
 
   }
-
-
 
   async presentCreateRoom() {
     const alert = await this.alertController.create({
@@ -66,6 +67,11 @@ export class HomePage implements OnInit {
           name: 'roomName',
           type: 'text',
           placeholder: "Muzlu kek"
+        },
+        {
+          name: 'roomMaxUserCount',
+          type: 'text',
+          placeholder: "Kaç Kişi (maks 10)"
         }
       ],
       buttons: [
@@ -78,8 +84,18 @@ export class HomePage implements OnInit {
         }, {
           text: 'Ok',
           handler: (data) => {
+              var req = {
+                roomName: data.roomName,
+                roomMaxUserCount: parseInt(data.roomMaxUserCount),
+                roomAdmin:this.userS.userInformation['username']
+              }
 
-            this.http.post("https://192.168.2.36:45455/api/room",JSON.stringify(data.roomName),this.httpOptions).subscribe(x=>{
+            this.http.post("https://192.168.2.36:45455/api/room",req,this.httpOptions).subscribe(x=>{
+              if(x){
+                this.userS.isAdmin = true;
+                this.router.navigate([`/room/${x['id']}/${data.roomName}`])
+                this.socket.connection.off("Notify")
+              }
             })
           }
         }
@@ -89,21 +105,18 @@ export class HomePage implements OnInit {
     await alert.present();
   }
 
-  JoinRoom(roomId){
 
-    this.router.navigate(['/room/'+roomId])
-    this.socket.connection.off("Notify")
+  JoinRoom(roomId,roomName,userCount,roomMaxUserCount){
+
+    if(userCount<roomMaxUserCount){
+      this.router.navigate([`/room/${roomId}/${roomName}`])
+      this.socket.connection.off("Notify")
+    }
    
 
 
   }
 
-  ngOnInit() {
-
-
-
-  }
-
-
+  
 
 }

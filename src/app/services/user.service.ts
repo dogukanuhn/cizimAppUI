@@ -10,6 +10,8 @@ export class UserService {
   constructor(private http:HttpClient) { }
 
   public apiUrl = "https://192.168.2.36:45455/"
+  isAdmin = false;
+  
   ngOnInit() {
   }
 

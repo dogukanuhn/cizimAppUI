@@ -1,13 +1,14 @@
 <ion-header>
     <ion-toolbar>
-      <ion-title>Oda Numarası : {{roomId}}</ion-title>
+      <ion-title>Oda Adı: : {{roomName}}</ion-title>
       <ion-buttons slot="start">
-          <ion-back-button (click)="GoBack()" defaultHref="/"></ion-back-button>
+          <ion-back-button (click)="closeConnections()" defaultHref="/"></ion-back-button>
       </ion-buttons>
     </ion-toolbar>
   </ion-header>
 
 <ion-content>
+  <ion-button *ngIf="userS.isAdmin" (click)="closeRoom()"></ion-button>
     <ul>
       <li *ngFor="let item of chatMessage">{{item.username}}:{{item.message}}</li>
     </ul>
