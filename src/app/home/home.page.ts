@@ -41,13 +41,13 @@ export class HomePage {
             },this.httpOptions).subscribe(x=>{})
             }
 
-            this.socket.connection.on("Notify",x=>{;
-              console.log(x);
-              this.liste = x
-            })
+            
           }) 
 
-
+          this.socket.connection.on("Notify",x=>{;
+            console.log(x);
+            this.liste = x
+          })
          
           
         });
