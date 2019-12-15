@@ -1,35 +1,53 @@
 <ion-header>
-    <ion-toolbar>
-      <ion-title>Oda Adı: : {{roomName}}</ion-title>
-      <ion-buttons slot="start">
-          <ion-back-button (click)="closeConnections()" defaultHref="/"></ion-back-button>
-      </ion-buttons>
-    </ion-toolbar>
-  </ion-header>
+  <ion-toolbar>
+    <ion-title>Oda Adı: : {{roomName}}</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="closeConnections()" defaultHref="/"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
 
-<ion-content>
+<ion-content [forceOverscroll]="false">
   <div *ngIf="userS.isAdmin">
-    <ion-button  (click)="closeRoom()">oda kapat</ion-button>
-    <ion-button  (click)="userList()">kullanıcıları getir</ion-button>
-    <ion-button  (click)="checkKickStatus()">durumu kontrol et</ion-button>
-    
+    <ion-button (click)="closeRoom()">oda kapat</ion-button>
+    <ion-button (click)="userList()">kullanıcıları getir</ion-button>
+    <ion-button (click)="checkKickStatus()">durumu kontrol et</ion-button>
+
     <ion-list>
       <ion-item *ngFor="let item of kickList" (click)="kickStart(item.username,item.connectionId)">
-          {{item.username}}
+        {{item.username}}
       </ion-item>
     </ion-list>
 
   </div>
-  
-    <ul>
-      <li *ngFor="let item of chatMessage">{{item.username}}:{{item.message}}</li>
-    </ul>
+  <ion-row>
+    <ion-col *ngFor="let color of colors" [style.background]="color" class="color-block" tappable (click)="selectColor(color)"></ion-col>
+  </ion-row>
+  <ion-radio-group [(ngModel)]="selectedColor">
+    <ion-row>
+      <ion-col *ngFor="let color of colors" class="ion-text-center">
+        <ion-radio [value]="color"></ion-radio>
+      </ion-col>
+    </ion-row>
+  </ion-radio-group>
+  <ion-range min="2" max="20" color="primary" [(ngModel)]="lineWidth">
+    <ion-icon size="small" slot="start" name="brush"></ion-icon>
+    <ion-icon  slot="end" name="brush"></ion-icon>
+
+  </ion-range>
+
+  <canvas #drawingCanvas (touchstart)="startDrawing($event)" (touchend)="endDrawing($event)" (touchmove)="moved($event)"
+    (mousedown)="startDrawing($event)" (mouseup)="endDrawing($event)" (mousemove)="moved($event)"></canvas>
+  <ion-button (click)="exportCanvasImage()">asd</ion-button>
+  <ul>
+    <li *ngFor="let item of chatMessage">{{item.username}}:{{item.message}}</li>
+  </ul>
 
 
 </ion-content>
 
 
 <ion-footer>
-    <ion-input placeholder="Mesajınız.." [(ngModel)]="messageText"></ion-input>
-    <ion-button (click)="SendMessage(messageText)">></ion-button>
+  <ion-input placeholder="Mesajınız.." [(ngModel)]="messageText"></ion-input>
+  <ion-button (click)="SendMessage(messageText)">></ion-button>
 </ion-footer>
