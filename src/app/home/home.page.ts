@@ -31,21 +31,24 @@ export class HomePage {
       if(this.socket.connection.state == signalR.HubConnectionState.Disconnected){
         this.socket.connection.start().then(x=>{
           
-          this.socket.connection.on("SetConnectionId",x=>{
-            this.userS.userConnectionId = x;
+          this.socket.connection.invoke("GetConnecionId").then(x=>{
+            if(x){
+              this.userS.userConnectionId = x;
             console.log(x);
             this.http.post(this.apiUrl+"api/user/connect",{
               Username:this.userS.userInformation['username'],
               ConnectionId:x
             },this.httpOptions).subscribe(x=>{})
+            }
 
-          })    
+            this.socket.connection.on("Notify",x=>{;
+              console.log(x);
+              this.liste = x
+            })
+          }) 
 
 
-          this.socket.connection.on("Notify",x=>{;
-            console.log(x);
-            this.liste = x
-          })
+         
           
         });
       }else if(this.socket.connection.state == signalR.HubConnectionState.Connected){
