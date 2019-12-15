@@ -8,7 +8,19 @@
   </ion-header>
 
 <ion-content>
-  <ion-button *ngIf="userS.isAdmin" (click)="closeRoom()"></ion-button>
+  <div *ngIf="userS.isAdmin">
+    <ion-button  (click)="closeRoom()">oda kapat</ion-button>
+    <ion-button  (click)="userList()">kullanıcıları getir</ion-button>
+    <ion-button  (click)="checkKickStatus()">durumu kontrol et</ion-button>
+    
+    <ion-list>
+      <ion-item *ngFor="let item of kickList" (click)="kickStart(item.username,item.connectionId)">
+          {{item.username}}
+      </ion-item>
+    </ion-list>
+
+  </div>
+  
     <ul>
       <li *ngFor="let item of chatMessage">{{item.username}}:{{item.message}}</li>
     </ul>

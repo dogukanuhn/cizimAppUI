@@ -11,8 +11,9 @@
 
 
   <ion-list>
-    <ion-item (click)="JoinRoom(item.id,item.roomName,item.roomUserCount,item.roomMaxUserCount)" *ngFor="let item of liste">
+    <ion-item (click)="JoinRoom(item.id,item.roomName,item.roomUserCount,item.roomMaxUserCount,item.roomPassword)" *ngFor="let item of liste">
       <span>{{item.roomName}}</span>
+      <span *ngIf="item.roomPassword"><ion-icon name="lock"></ion-icon></span>
       <span slot="end">{{item.roomUserCount}}/{{item.roomMaxUserCount}}</span>
 
     </ion-item>

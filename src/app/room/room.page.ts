@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SocketService } from '../services/socket.service';
 import * as signalR from '@microsoft/signalr';
 import { ThrowStmt } from '@angular/compiler';
-import { ToastController } from '@ionic/angular';
+import { ToastController, AlertController } from '@ionic/angular';
 import { UserService } from '../services/user.service';
 import { HttpClient } from '@angular/common/http';
 
@@ -15,12 +15,16 @@ import { HttpClient } from '@angular/common/http';
 })
 export class RoomPage implements OnInit {
 
-  constructor(private nav: ActivatedRoute, private router: Router, private http: HttpClient, private socket: SocketService, public toastController: ToastController, private userS: UserService) { }
+  constructor(private nav: ActivatedRoute,private alertController:AlertController, private router: Router, private http: HttpClient, private socket: SocketService, public toastController: ToastController, private userS: UserService) { }
 
   roomId = this.nav.snapshot.params.id;
   roomName = this.nav.snapshot.params.roomName;
   chatMessage = []
-  
+  kickList = [];
+
+  kickUserId;
+  kickUserConnectionId;
+  kickUsername;
 
   async presentToast(message) {
     const toast = await this.toastController.create({
@@ -30,11 +34,52 @@ export class RoomPage implements OnInit {
     toast.present();
   }
 
+  async presentKickMessage(username,id) {
+    const alert = await this.alertController.create({
+      message:`${username} kullanıcısı için atma isteği`,
+      buttons: [
+        {
+          text: 'Hayır',
+          handler: () => {
+            var req = {
+              id:id,
+              username:username
+            }
+          this.http.post("https://192.168.2.36:45455/api/room/kickvoteno",req).subscribe(x=>{
+
+          });
+          }
+        }, {
+          text: 'Evet',
+          handler: (data) => {
+              var req = {
+                id:id,
+                username:username
+              }
+
+            this.http.post("https://192.168.2.36:45455/api/room/kickvoteyes",req).subscribe(x=>{
+            
+          });
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
   ionViewWillEnter() {
 
-    this.http.get(this.socket.apiUrl+"api/room/" + this.roomName).subscribe(x => {
+    this.http.get(this.socket.apiUrl + "api/room/" + this.roomName).subscribe(x => {
       if (x) {
-        this.socket.connection.send("AddToGroup", this.roomName);
+        let req = {
+          connectedRoomName:this.roomName,
+          connectionId:this.userS.userConnectionId
+        }
+
+        this.http.post(this.socket.apiUrl + 'api/room/joinroom',req).subscribe(x=>{
+
+        })
 
         this.socket.connection.send("GetAllChatMessage", this.roomName);
 
@@ -51,8 +96,23 @@ export class RoomPage implements OnInit {
         this.socket.connection.on("GroupMessage", x => {
           this.chatMessage.push(x);
         })
+        this.socket.connection.on("KickStart", x=>{
+          
+          console.log(x)
+          console.log(this.userS.userConnectionId);
+          if(!this.userS.isAdmin && this.userS.userConnectionId  !== x.connectionId){
+            this.presentKickMessage(x.username,x.ConnectionId);
+          }
+        })
         this.socket.connection.on("AdminCall", x => {
           this.userS.isAdmin = x;
+        })
+        this.socket.connection.on("KickedFromRoom",x=>{
+          if(x){
+            this.presentToast(this.roomName + " Odasından atıldınız.");
+          this.closeConnections();
+          this.router.navigate(['/home']);
+          }
         })
         this.socket.connection.on("IsClosed", x => {
           this.presentToast(this.roomName + " Odası Yöneticisi Tarafından Kapatıldı.");
@@ -60,32 +120,62 @@ export class RoomPage implements OnInit {
           this.router.navigate(['/home']);
 
         })
-      }else{
+      } else {
         this.presentToast("Oda Kapatılmış")
         this.router.navigate(['/home']);
       }
     })
 
-
-
-
-
-
   }
 
-  closeRoom() {
-    if(this.userS.isAdmin){
-      this.closeConnections();
-    this.http.post(this.socket.apiUrl + 'api/room/remove',{
-      roomName:this.roomName,
-      id:this.roomId
-    }).subscribe(x=>{
-      if(x){
-        this.presentToast("Odanız Kapatıldı")
-        this.router.navigate(['/home']);
-      }
-
+  checkKickStatus(){
+    
+    var req = {
+      username:this.kickUsername,
+      connectionId:this.kickUserConnectionId
+    }
+    console.log(req);
+    this.http.post(this.socket.apiUrl+'api/room/kickstatus',req).subscribe(x=>{
+      console.log(x);
     })
+  }
+ 
+
+  kickStart(uname,userId){
+    this.kickUserId = userId;
+    this.kickUsername =uname 
+    let data = {
+      connectionId:userId
+    }
+    this.http.post(this.socket.apiUrl+'api/room/kickstart',data).subscribe(x=>{
+      console.log(x)  
+      this.kickUserConnectionId = x['connectionId'];
+       
+    })
+  }
+
+  userList() {
+    this.http.get(this.socket.apiUrl + 'api/room/roomuser/'+this.roomName,this.userS.httpOptions).subscribe((x:any) => {
+      if (x) {
+        this.kickList = x;
+      }
+    })
+  }
+
+
+  closeRoom() {
+    if (this.userS.isAdmin) {
+      this.closeConnections();
+      this.http.post(this.socket.apiUrl + 'api/room/remove', {
+        roomName: this.roomName,
+        id: this.roomId
+      }).subscribe(x => {
+        if (x) {
+          this.presentToast("Odanız Kapatıldı")
+          this.router.navigate(['/home']);
+        }
+
+      })
     }
   }
 
@@ -96,7 +186,17 @@ export class RoomPage implements OnInit {
     this.socket.connection.off("GroupMessage")
     this.socket.connection.off("AdminCall")
     this.socket.connection.off("IsClosed")
-    this.socket.connection.send("RemoveFromGroup", this.roomName);
+    this.socket.connection.off("KickStart")
+    this.socket.connection.off("KickedFromRoom")
+    let req = {
+      connectedRoomName:this.roomName,
+      connectionId:this.userS.userConnectionId
+    }
+
+    this.http.post(this.socket.apiUrl + 'api/room/quitroom',req).subscribe(x=>{
+
+    })
+    
     this.userS.isAdmin = false;
 
   }

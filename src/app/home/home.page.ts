@@ -30,13 +30,18 @@ export class HomePage {
 
       if(this.socket.connection.state == signalR.HubConnectionState.Disconnected){
         this.socket.connection.start().then(x=>{
+          
           this.socket.connection.on("SetConnectionId",x=>{
+            this.userS.userConnectionId = x;
             console.log(x);
             this.http.post(this.apiUrl+"api/user/connect",{
               Username:this.userS.userInformation['username'],
               ConnectionId:x
             },this.httpOptions).subscribe(x=>{})
+
           })    
+
+
           this.socket.connection.on("Notify",x=>{;
             console.log(x);
             this.liste = x
@@ -44,6 +49,7 @@ export class HomePage {
           
         });
       }else if(this.socket.connection.state == signalR.HubConnectionState.Connected){
+        
         this.socket.connection.on("Notify",x=>{;
           console.log(x);
           this.liste = x
@@ -72,6 +78,11 @@ export class HomePage {
           name: 'roomMaxUserCount',
           type: 'text',
           placeholder: "Kaç Kişi (maks 10)"
+        },
+        {
+          name: 'roomPassword',
+          type: 'text',
+          placeholder: "Oda şifresi(yoksa boş)"
         }
       ],
       buttons: [
@@ -87,7 +98,8 @@ export class HomePage {
               var req = {
                 roomName: data.roomName,
                 roomMaxUserCount: parseInt(data.roomMaxUserCount),
-                roomAdmin:this.userS.userInformation['username']
+                roomAdmin:this.userS.userInformation['username'],
+                roomPassword:data.roomPassword
               }
 
             this.http.post("https://192.168.2.36:45455/api/room",req,this.httpOptions).subscribe(x=>{
@@ -106,7 +118,7 @@ export class HomePage {
   }
 
 
-  JoinRoom(roomId,roomName,userCount,roomMaxUserCount){
+  JoinRoom(roomId,roomName,userCount,roomMaxUserCount,roomLocked){
 
     if(userCount<roomMaxUserCount){
       this.router.navigate([`/room/${roomId}/${roomName}`])
