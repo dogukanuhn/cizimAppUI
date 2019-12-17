@@ -6,7 +6,7 @@ import * as signalR from "@microsoft/signalr";
 export class SocketService {
 
   
-  public apiUrl = "https://192.168.2.36:45455/"
+  public apiUrl = "https://192.168.2.36:45456/"
   public connection = new signalR.HubConnectionBuilder().withUrl(this.apiUrl+ "chathub", {
     skipNegotiation: true,
     transport: signalR.HttpTransportType.WebSockets

@@ -1,8 +1,8 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Oda Adı: : {{roomName}}</ion-title>
+    <ion-title>Oda Adı: : {{room.roomName}}</ion-title>
     <ion-buttons slot="start">
-      <ion-back-button (click)="closeConnections()" defaultHref="/"></ion-back-button>
+      <ion-back-button (click)="room.closeConnections()" defaultHref="/"></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
@@ -14,7 +14,7 @@
     <ion-button (click)="checkKickStatus()">durumu kontrol et</ion-button>
 
     <ion-list>
-      <ion-item *ngFor="let item of kickList" (click)="kickStart(item.username,item.connectionId)">
+      <ion-item *ngFor="let item of room.kickList" (click)="kickStart(item.username,item.connectionId)">
         {{item.username}}
       </ion-item>
     </ion-list>
@@ -49,5 +49,5 @@
 
 <ion-footer>
   <ion-input placeholder="Mesajınız.." [(ngModel)]="messageText"></ion-input>
-  <ion-button (click)="SendMessage(messageText)">></ion-button>
+  <ion-button (click)="room.SendMessage(messageText)">></ion-button>
 </ion-footer>
