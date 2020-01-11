@@ -9,20 +9,32 @@
 <ion-footer>
   <ion-card>
     <ion-card-content>
-      <h2 class="ion-text-center ion-padding-bottom">Giriş Formu</h2>
+      <h2 class="ion-text-center ion-padding-bottom">Kayıt Formu</h2>
       <ion-item>
         <ion-label>
           <ion-icon name="contact" size="large"></ion-icon>
         </ion-label>
-        <ion-input placeholder="Kullanıcı Adı" [(ngModel)]="username"></ion-input>
+        <ion-input placeholder="Kullanıcı Adı"></ion-input>
       </ion-item>
       <ion-item>
         <ion-label>
           <ion-icon name="lock" size="large"></ion-icon>
         </ion-label>
-        <ion-input placeholder="Şifre" [(ngModel)]="password"></ion-input>
+        <ion-input placeholder="Şifre"></ion-input>
       </ion-item>
-      <ion-button (click)="Login(username,password)" expand="block" class="ion-margin-top">Giriş Yap</ion-button>
+      <ion-item>
+        <ion-label>
+          <ion-icon name="lock" size="large"></ion-icon>
+        </ion-label>
+        <ion-input placeholder="Şifre(yeniden)"></ion-input>
+      </ion-item>
+      <ion-item>
+        <ion-label>
+          <ion-icon name="mail" size="large"></ion-icon>
+        </ion-label>
+        <ion-input placeholder="E-Posta"></ion-input>
+      </ion-item>
+      <ion-button expand="block" class="ion-margin-top">Kayıt Ol</ion-button>
 
     </ion-card-content>
   </ion-card>

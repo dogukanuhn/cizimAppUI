@@ -18,7 +18,7 @@ export class HomePage {
   constructor(private alertController: AlertController, public http: HttpClient,private router:Router,private socket:SocketService,private userS:UserService) {
 
   }
-  public apiUrl = "https://192.168.2.36:45456/"
+  public apiUrl = "https://192.168.2.36:45455/"
   liste = []
   
   httpOptions = {
@@ -105,7 +105,7 @@ export class HomePage {
                 roomPassword:data.roomPassword
               }
 
-            this.http.post("https://192.168.2.36:45456/api/room",req,this.httpOptions).subscribe(x=>{
+            this.http.post("https://192.168.2.36:45455/api/room",req,this.httpOptions).subscribe(x=>{
               if(x){
                 this.userS.isAdmin = true;
                 this.router.navigate([`/room/${x['id']}/${data.roomName}`])

@@ -40,7 +40,7 @@ export class RoomService {
               id: id,
               username: username
             }
-            this.http.post("https://192.168.2.36:45456/api/room/kickvoteno", req).subscribe(x => {
+            this.http.post("https://192.168.2.36:45455/api/room/kickvoteno", req).subscribe(x => {
 
             });
           }
@@ -52,7 +52,7 @@ export class RoomService {
               username: username
             }
 
-            this.http.post("https://192.168.2.36:45456/api/room/kickvoteyes", req).subscribe(x => {
+            this.http.post("https://192.168.2.36:45455/api/room/kickvoteyes", req).subscribe(x => {
 
             });
           }
