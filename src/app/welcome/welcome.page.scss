@@ -5,7 +5,7 @@ ion-icon{
     color:$base-color;
 }
 ion-footer{
-    background:$base-color;
+   
     ion-card{
         ion-card-content{
             padding: 40px;
@@ -45,9 +45,5 @@ ion-footer{
     }
    
 }
-.footer-md:before{
-    content: none;
-}
-ion-content{
-    --background: #2C3B49;
-}
+
+

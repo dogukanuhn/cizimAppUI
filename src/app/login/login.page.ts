@@ -15,7 +15,7 @@ export class LoginPage  {
   Login(user,pass){
     this.userService.Login(user,pass).then(x=>{
       if(x){
-        this.router.navigate(['/home']);
+        this.router.navigate(['/lobby']);
       }
     });
   }

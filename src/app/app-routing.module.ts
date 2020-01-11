@@ -13,6 +13,10 @@ const routes: Routes = [
     path: 'welcome',
     loadChildren: () => import('./welcome/welcome.module').then( m => m.WelcomePageModule)
   
+  },
+  {
+    path: 'lobby',
+    loadChildren: () => import('./lobby/lobby.module').then( m => m.LobbyPageModule)
   }
   
   
