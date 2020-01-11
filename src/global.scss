@@ -33,11 +33,16 @@
 .footer-md:before{
     content: none !important;
 }
+.header-md:after{
+    content: none !important;
+}
 
 ion-footer{
     background:#2C3B49;
 }
-
+ion-toolbar{
+    --background:#2C3B49;
+}
 ion-content{
     --background:#2C3B49;
     .backButton{

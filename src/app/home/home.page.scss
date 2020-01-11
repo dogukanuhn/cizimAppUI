@@ -1,1 +1,50 @@
+.holder{
+    background: white;
+    height: 100%;
+    border-radius: 50px 50px 0 0;
+
+    .holder-inside{
+        padding: 12px;
+        
+        .propertiesButton{
+            text-transform: capitalize;
+            --border-radius: 30px;
+            --background:#F9F9F9;
+            --color-activated:#2C3B49;
+            color:#2C3B49;
+            --background-activated:#F1F1F1;
+            --box-shadow: 0px 3px 5px 0px rgba(0,0,0,0.6);
+        }
+    }
+    .holder-main{
+        ion-card{
+            --background:#F9F9F9;
+            border-radius: 40px;
+            ion-card-content{
+                padding-top: 0;
+            padding-bottom: 0;
+            }
+            span{
+                color:#2C3B49;
+                font-size: 15px;
+                font-weight: bold;
+            }
+            ion-icon{
+                zoom:1.5;
+            }
+        }
+    }
+}
+ion-header{
+    ion-toolbar{
+        ion-item{
+            --background:#2C3B49;
+            color:white;    
+
+            ion-input{
+                --placeholder-opacity:1;
+            }
+        }
+    }
+}
 
