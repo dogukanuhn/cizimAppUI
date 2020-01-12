@@ -4,15 +4,16 @@
     <ion-card>
 
         <ion-card-content>
-            <ion-item>
+            <ion-button expand="block" color="primary">Facebook ile Giriş Yap</ion-button>
+            <ion-button expand="block" color="danger">Google ile giriş yap</ion-button>
+            <ion-item class="ion-margin-top">
                 <ion-label>
                     <ion-icon name="contact" size="large"></ion-icon>
                 </ion-label>
-                <ion-input placeholder="Kullanıcı Adı"></ion-input>
+                <ion-input  placeholder="Kullanıcı Adı" [(ngModel)]="username"></ion-input>
             </ion-item>
-            <ion-button expand="block" >Hızlı Oyna</ion-button>
-            <p class="ion-text-center">Hemen oynayabilir <br>veya <br>kayıt olabilirsin!</p>
-            <ion-button routerLink="loginOptions" expand="block" >Kullanıcı İşlemleri</ion-button>
+            <ion-button expand="block" (click)="Login(username)">Hızlı Oyna</ion-button>
+
         </ion-card-content>
     </ion-card>
 </ion-footer>

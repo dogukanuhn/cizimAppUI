@@ -8,37 +8,39 @@ import { Storage } from '@ionic/storage';
 })
 export class UserService {
 
-  constructor(private http:HttpClient,private socket:SocketService,private storage:Storage) { }
+  constructor(private http: HttpClient, private socket: SocketService, private storage: Storage) { }
 
   public apiUrl = "https://192.168.2.36:45455/"
   isAdmin = false;
-  
+
   ngOnInit() {
   }
 
-  userInformation;
+  userInformation = {
+    username: null
+  };
   userConnectionId;
 
   httpOptions = {
-    headers: new HttpHeaders({'Content-Type': 'application/json'})
+    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
   }
 
 
-  public Login(user,pass){
-   return new Promise((resolve,reject) =>{
-    this.http.post(this.apiUrl+"api/user",{
-      Username:user,
-      Password:pass
-  },this.httpOptions).subscribe(x=>{
-    if(x){
-      this.userInformation = x;
-      
-      this.storage.set("userinfo",this.userInformation);
-      console.log(x);
-      resolve(true);
-    }
-    resolve(false);
-  })
-   })
+  public Login(user, pass) {
+    return new Promise((resolve, reject) => {
+      this.http.post(this.apiUrl + "api/user", {
+        Username: user,
+        Password: pass
+      }, this.httpOptions).subscribe(x => {
+        if (x) {
+          // this.userInformation = x;
+
+          this.storage.set("userinfo", this.userInformation);
+          console.log(x);
+          resolve(true);
+        }
+        resolve(false);
+      })
+    })
   }
 }

@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { UserService } from '../services/user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-welcome',
@@ -7,9 +9,19 @@ import { Component, OnInit } from '@angular/core';
 })
 export class WelcomePage implements OnInit {
 
-  constructor() { }
+  constructor(private userService:UserService,private router:Router) { }
 
   ngOnInit() {
+  }
+
+
+  Login(user : string){
+      if(user.length > 3){
+        this.userService.userInformation['username'] = user;
+        this.router.navigate(['/lobby']);
+     
+      }
+
   }
 
 }
