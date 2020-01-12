@@ -1,0 +1,17 @@
+ion-toolbar{
+    color:white;
+}
+@import '../home/home.page.scss';
+ion-content{
+    ion-list{
+        margin-top:10px;
+    }
+    ion-button{
+        --background:#2C3B49;
+        color:white;
+    }
+    ion-item{
+    
+        color:#2C3B49;
+    }
+}

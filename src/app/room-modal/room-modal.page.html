@@ -1,12 +1,33 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Modal Content</ion-title>
+    <ion-title>Oda Seçenekleri</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="dismissModal()">Close</ion-button>
+      <ion-button (click)="dismissModal()">Kapat</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
+  <div class="holder">
+    <div class="holder-inside">
+      <ion-list>
+        <ion-item lines="none">
+          <ion-button (click)="closeRoom()" size="large"> Odayı Kapat </ion-button>
+          <ion-button (click)="kickStart()" size="large" [disabled]="isKickButtonOn"> Oylama Başlat </ion-button>
+        </ion-item>
+        
+          <ion-radio-group allow-empty-selection>
+            <ion-list-header>
+              <ion-label>Oyuncular</ion-label>
+            </ion-list-header>
+            <ion-item *ngFor="let item of room.kickList">
+              <ion-label>{{item.username}}</ion-label>
+              <ion-radio slot="end" color="primary" (click)="selectUser(item.username,item.connectionId)"></ion-radio>
+            </ion-item>
+  
+          </ion-radio-group>
+        
+      </ion-list>
+    </div>
+  </div>
 </ion-content>

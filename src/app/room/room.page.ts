@@ -19,7 +19,7 @@ export class RoomPage implements AfterViewInit {
 
   constructor(public modalController: ModalController,private plt:Platform,private room:RoomService,private nav: ActivatedRoute,  private router: Router, private http: HttpClient, private socket: SocketService, public toastController: ToastController, private userS: UserService) { }
 
-  // @ViewChild('drawingCanvas',{static:false}) canvas :any;
+   @ViewChild('drawingCanvas',{static:false}) canvas :any;
   canvasElement :any;
 
   saveX : number;
@@ -36,30 +36,40 @@ export class RoomPage implements AfterViewInit {
 
   async presentModal() {
     const modal = await this.modalController.create({
-      component: RoomModalPage
+      component: RoomModalPage,
+      componentProps: {
+        'firstName': 'Douglas',
+        'lastName': 'Adams',
+        'middleInitial': 'N'
+      }
     });
     return await modal.present();
   }
   ngAfterViewInit(){
-    // this.canvasElement = this.canvas.nativeElement;
-    // this.canvasElement.width = this.plt.width() + '';
-    // this.canvasElement.height = 200;
+    this.canvasElement = this.canvas.nativeElement;
+    this.canvasElement.width = this.plt.width() + '';
+     this.canvasElement.height = 200;
   }
   startDrawing(ev) {
-    console.log(ev)
-    const canvasPosition = this.canvasElement.getBoundingClientRect();
+    if(!this.userS.isAdmin){
+      const canvasPosition = this.canvasElement.getBoundingClientRect();
     this.drawing = true;
     this.saveX = ev.pageX - canvasPosition.x;
     this.saveY = ev.pageY - canvasPosition.y;
+    }
+    
 
   }
   endDrawing(ev) {
+    if(!this.userS.isAdmin){
     this.drawing = false;
     this.socket.connection.send("SendCanvas",this.exportCanvasImage(),this.room.roomName);
-    console.log(ev)
+    }
+
   }
   moved(ev) {
-    if(!this.drawing) return
+    if(!this.userS.isAdmin){
+      if(!this.drawing) return
     console.log(ev)
     const canvasPosition = this.canvasElement.getBoundingClientRect();
     let ctx = this.canvasElement.getContext('2d');
@@ -81,6 +91,7 @@ export class RoomPage implements AfterViewInit {
     this.saveX = currentX;
     this.saveY = currentY;
 
+    }
   }
 
   setBackgroundImage(canvasUrl){
@@ -103,70 +114,70 @@ export class RoomPage implements AfterViewInit {
 
 
   ionViewWillEnter() {
-    // this.room.roomId = this.nav.snapshot.params.id;
-    // this.room.roomName = this.nav.snapshot.params.roomName;
+    this.room.roomId = this.nav.snapshot.params.id;
+    this.room.roomName = this.nav.snapshot.params.roomName;
 
-    // this.http.get(this.socket.apiUrl + "api/room/" + this.room.roomName).subscribe(x => {
-    //   if (x) {
-    //     let req = {
-    //       connectedRoomName: this.room.roomName,
-    //       connectionId: this.userS.userConnectionId
-    //     }
+    this.http.get(this.socket.apiUrl + "api/room/" + this.room.roomName).subscribe(x => {
+      if (x) {
+        let req = {
+          connectedRoomName: this.room.roomName,
+          connectionId: this.userS.userConnectionId
+        }
 
-    //     this.http.post(this.socket.apiUrl + 'api/room/joinroom', req).subscribe(x => {
+        this.http.post(this.socket.apiUrl + 'api/room/joinroom', req).subscribe(x => {
 
-    //     })
+        })
 
-    //     if(!this.userS.isAdmin){
-    //       this.socket.connection.on("GetCanvas",x=>{
-    //         this.setBackgroundImage(x);
-    //       })
-    //     }
+        if(!this.userS.isAdmin){
+          this.socket.connection.on("GetCanvas",x=>{
+            this.setBackgroundImage(x);
+          })
+        }
       
-    //     this.socket.connection.send("GetAllChatMessage", this.room.roomName);
+        this.socket.connection.send("GetAllChatMessage", this.room.roomName);
 
-    //     this.socket.connection.on("GroupJoined", x => {
-    //       this.room.presentToast(x)
-    //     })
-    //     this.socket.connection.on("GroupLeaved", x => {
-    //       this.room.presentToast(x)
-    //     })
-    //     this.socket.connection.on("GroupMessage", x => {
-    //       this.chatMessage.push(x);
-    //     })
+        this.socket.connection.on("GroupJoined", x => {
+          this.room.presentToast(x)
+        })
+        this.socket.connection.on("GroupLeaved", x => {
+          this.room.presentToast(x)
+        })
+        this.socket.connection.on("GroupMessage", x => {
+          this.chatMessage.push(x);
+        })
         
         
-    //    if(!this.userS.isAdmin){
-    //     this.socket.connection.on("KickStart", x => {
+       if(!this.userS.isAdmin){
+        this.socket.connection.on("KickStart", x => {
 
-    //       console.log(x)
-    //       console.log(this.userS.userConnectionId);
-    //       if (!this.userS.isAdmin && this.userS.userConnectionId !== x.connectionId) {
-    //         this.room.presentKickMessage(x.username, x.ConnectionId);
-    //       }
-    //     })
-    //     this.socket.connection.on("AdminCall", x => {
-    //       this.userS.isAdmin = x;
-    //     })
-    //     this.socket.connection.on("KickedFromRoom", x => {
-    //       if (x) {
-    //         this.room.presentToast(this.room.roomName + " Odasından atıldınız.");
-    //         this.room.closeConnections();
-    //         this.router.navigate(['/home']);
-    //       }
-    //     })
-    //     this.socket.connection.on("IsClosed", x => {
-    //       this.room.presentToast(this.room.roomName + " Odası Yöneticisi Tarafından Kapatıldı.");
-    //       this.room.closeConnections();
-    //       this.router.navigate(['/home']);
+          console.log(x)
+          console.log(this.userS.userConnectionId);
+          if (!this.userS.isAdmin && this.userS.userConnectionId !== x.connectionId) {
+            this.room.presentKickMessage(x.username, x.ConnectionId);
+          }
+        })
+        this.socket.connection.on("AdminCall", x => {
+          this.userS.isAdmin = x;
+        })
+        this.socket.connection.on("KickedFromRoom", x => {
+          if (x) {
+            this.room.presentToast(this.room.roomName + " Odasından atıldınız.");
+            this.room.closeConnections();
+            this.router.navigate(['/home']);
+          }
+        })
+        this.socket.connection.on("IsClosed", x => {
+          this.room.presentToast(this.room.roomName + " Odası Yöneticisi Tarafından Kapatıldı.");
+          this.room.closeConnections();
+          this.router.navigate(['/home']);
 
-    //     })
-    //    }
-    //   } else {
-    //     this.room.presentToast("Oda Kapatılmış")
-    //     this.router.navigate(['/home']);
-    //   }
-    // })
+        })
+       }
+      } else {
+        this.room.presentToast("Oda Kapatılmış")
+        this.router.navigate(['/home']);
+      }
+    })
 
   }
 
@@ -183,20 +194,24 @@ export class RoomPage implements AfterViewInit {
     this.room.kickStart(uname,userId);
   }
 
-  userList() {
+  // userList() {
 
-    this.room.userList();
+  //   this.room.userList();
 
 
+  // }
+
+  leaveRoom(){
+    this.room.closeConnections();
+    this.router.navigate(['/home']);
   }
 
-
-  closeRoom() {
-    this.room.closeRoom().then(x=>{
-      this.room.closeConnections();
-      this.router.navigate(['/home']);
-    })
-  }
+  // closeRoom() {
+  //   this.room.closeRoom().then(x=>{
+  //     this.room.closeConnections();
+  //     this.router.navigate(['/home']);
+  //   })
+  // }
 
 
 
