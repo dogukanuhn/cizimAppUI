@@ -29,6 +29,7 @@
     "cordova-android": "8.1.0",
     "cordova-sqlite-storage": "^4.0.0",
     "core-js": "^2.6.11",
+    "ngx-countdown": "^8.0.3",
     "ngx-socket-io": "^3.0.1",
     "rxjs": "~6.5.1",
     "rxjs-compat": "^6.5.3",

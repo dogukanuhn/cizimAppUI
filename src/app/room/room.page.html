@@ -10,7 +10,7 @@
         <span class="roomName">Oda adı: {{room.roomName}}</span>
       </ion-col>
       <ion-col size="2" class="ion-align-self-center ion-text-right">
-        <span class="time ">05:00</span>
+        <span class="time "><countdown #turnTimer [config]="turnTimerConfig" (event)="handleTurnTimer($event)"></countdown></span>
 
       </ion-col>
       <ion-col size="2" class="ion-text-right">
@@ -28,11 +28,12 @@
 <ion-content [forceOverscroll]="false">
   <div class="holder">
     <div class="holder-inside">
+      <ion-button  (click)="nextTurn()"> sonraki turn </ion-button>
       <div class="word-area ion-text-center ion-margin-top">
-        _ _ _ _ _
+        {{word}}
       </div>
       <div class="canvas ion-margin-top">
-
+        <countdown [hidden]="!gameTimerStatus"  class="gameCountDown" #cd [config]="timerConfig"  (event)="handleStartCountDown($event)"></countdown>
         <canvas #drawingCanvas (touchstart)="startDrawing($event)" (touchend)="endDrawing($event)"
           (touchmove)="moved($event)" (mousedown)="startDrawing($event)" (mouseup)="endDrawing($event)"
           (mousemove)="moved($event)"></canvas>

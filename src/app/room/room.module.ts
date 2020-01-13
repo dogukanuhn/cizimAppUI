@@ -9,14 +9,14 @@ import { RoomPageRoutingModule } from './room-routing.module';
 import { RoomPage } from './room.page';
 import { RoomModalPage } from '../room-modal/room-modal.page';
 import { RoomModalPageModule } from '../room-modal/room-modal.module';
-
+import { CountdownModule } from 'ngx-countdown';
 @NgModule({
   entryComponents:[RoomModalPage],
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    
+    CountdownModule,
     RoomPageRoutingModule,
     RoomModalPageModule
   ],

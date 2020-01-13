@@ -81,6 +81,18 @@ export class RoomService {
 
   }
 
+  startGame() {
+    return new Promise((resolve, reject) => {
+      let data = {
+        roomName:this.roomName,
+      }
+      this.http.post(this.socket.apiUrl + 'api/room/startgame', data).subscribe(x=>{
+        resolve(x);
+      })
+    })
+
+  }
+
   checkKickStatus() {
     return new Promise((resolve,reject) => {
       var req = {
@@ -125,7 +137,23 @@ export class RoomService {
     this.socket.connection.send("SendMessageToGroup", this.roomName, message, this.userS.userInformation['username']);
   }
   
+  nextTurn(){
+    return new Promise((resolve, reject) => {
+      let data = {
+        
+        roomName:this.roomName,
+
+      }
+
+      this.http.post(this.socket.apiUrl + 'api/room/nextturn', data).subscribe(x=>{
+        resolve(x);
+
+      })
+    })
+  }
+  
   closeConnections() {
+
     this.socket.connection.off("GroupJoined")
     this.socket.connection.off("GroupLeaved")
     this.socket.connection.off("GroupMessage")
