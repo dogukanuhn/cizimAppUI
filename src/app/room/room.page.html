@@ -56,8 +56,8 @@
           <ion-col size="4" >
             <div class="users">
               <ul>
-                <li *ngFor="let item of [1,2,3,4,5,6,7,8,9]"><span class="playerName">altu</span>
-                  <br>Puan:10
+                <li *ngFor="let item of [1,2,3]"><span class="playerName">Altux</span>
+                  <br>Puan:0
                 </li>
 
               
@@ -69,7 +69,7 @@
               <div class="chatText"><span>Chat</span></div>
               <div class="chatMessage">
                 <ul>
-                  <li *ngFor="let item of chatMessage" [ngClass]="{'correctAnswer': item.answer}">{{item.username}}:{{item.message}}</li>
+                  <li *ngFor="let item of chatMessage" [ngClass]="{'correctAnswer': item.answer}">{{item.username}}:{{item.answer ? item.username === userS.userInformation.username ? item.message : '******' : item.message }}</li>
 
                 </ul>
               </div>

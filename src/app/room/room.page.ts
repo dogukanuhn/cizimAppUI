@@ -53,7 +53,6 @@ export class RoomPage implements AfterViewInit {
   yourTurn = false;
   chatStatus = true;
 
-
   handleTurnTimer(a) {
     console.log(a);
     let ctx = this.canvasElement.getContext('2d');
@@ -213,9 +212,9 @@ export class RoomPage implements AfterViewInit {
         })
 
         this.socket.connection.on("DisableChat",  x=>{
-          console.log(!x);
           this.chatStatus = !x;
         });
+
 
         
 
