@@ -28,9 +28,9 @@
 <ion-content [forceOverscroll]="false">
   <div class="holder">
     <div class="holder-inside">
-      <ion-button  (click)="nextTurn()"> sonraki turn </ion-button>
       <div class="word-area ion-text-center ion-margin-top">
-        {{word}}
+        {{room.GameTurn.wordName}}
+     
       </div>
       <div class="canvas ion-margin-top">
         <countdown [hidden]="!gameTimerStatus"  class="gameCountDown" #cd [config]="timerConfig"  (event)="handleStartCountDown($event)"></countdown>
@@ -69,7 +69,7 @@
               <div class="chatText"><span>Chat</span></div>
               <div class="chatMessage">
                 <ul>
-                  <li *ngFor="let item of chatMessage">{{item.username}}:{{item.message}}</li>
+                  <li *ngFor="let item of chatMessage" [ngClass]="{'correctAnswer': item.answer}">{{item.username}}:{{item.message}}</li>
 
                 </ul>
               </div>
@@ -128,6 +128,6 @@
   <ion-button (click)="room.SendMessage(messageText)">></ion-button> -->
   <ion-item lines="none">
     <ion-input placeholder="Mesajınız.." [(ngModel)]="messageText"></ion-input>
-    <ion-button (click)="room.SendMessage(messageText)">></ion-button>
+    <ion-button [disabled]="!chatStatus" (click)="room.SendMessage(messageText)">></ion-button>
   </ion-item>
 </ion-footer>

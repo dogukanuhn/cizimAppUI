@@ -21,6 +21,11 @@ export class RoomService {
   kickUserConnectionId;
   kickUsername;
 
+  GameTurn = {
+    wordName:null,
+    turn:null
+  }
+
   async presentToast(message) {
     const toast = await this.toastController.create({
       message: message,
@@ -134,7 +139,7 @@ export class RoomService {
   }
   
   SendMessage(message){
-    this.socket.connection.send("SendMessageToGroup", this.roomName, message, this.userS.userInformation['username']);
+    this.socket.connection.send("SendMessageToGroup", this.roomName, message, this.userS.userInformation['username'],this.userS.userConnectionId);
   }
   
   nextTurn(){
@@ -153,8 +158,10 @@ export class RoomService {
   }
   
   closeConnections() {
-
-    this.socket.connection.off("GroupJoined")
+    this.socket.connection.off("GameWord")
+    this.socket.connection.off("YourTurn")
+    this.socket.connection.off("StartTurnTimer")
+    this.socket.connection.off("StartGameTimer")
     this.socket.connection.off("GroupLeaved")
     this.socket.connection.off("GroupMessage")
     this.socket.connection.off("AdminCall")

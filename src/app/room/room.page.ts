@@ -51,7 +51,7 @@ export class RoomPage implements AfterViewInit {
   gameTimerStatus = false;
   isGameStart = false;
   yourTurn = false;
-  word
+  chatStatus = true;
 
 
   handleTurnTimer(a) {
@@ -67,9 +67,7 @@ export class RoomPage implements AfterViewInit {
     this.gameTimerStatus = false;
     if (a.status === 3 && this.userS.isAdmin) {
 
-      this.room.startGame().then(x => {
-        this.word = x['word'].WordName;
-      })
+      this.room.startGame();
 
     }
   }
@@ -173,9 +171,7 @@ export class RoomPage implements AfterViewInit {
           connectionId: this.userS.userConnectionId
         }
 
-        this.http.post(this.socket.apiUrl + 'api/room/joinroom', req).subscribe(x => {
-
-        })
+        this.http.post(this.socket.apiUrl + 'api/room/joinroom', req).subscribe();
 
 
         this.socket.connection.on("GetCanvas", x => {
@@ -183,6 +179,10 @@ export class RoomPage implements AfterViewInit {
           this.setBackgroundImage(x);
         })
 
+         
+        this.socket.connection.on("GameTurn", x => {
+         this.room.GameTurn = x;
+        })
 
         this.socket.connection.send("GetAllChatMessage", this.room.roomName);
 
@@ -212,6 +212,12 @@ export class RoomPage implements AfterViewInit {
 
         })
 
+        this.socket.connection.on("DisableChat",  x=>{
+          console.log(!x);
+          this.chatStatus = !x;
+        });
+
+        
 
         this.socket.connection.on("GroupJoined", x => {
           this.room.presentToast(x)

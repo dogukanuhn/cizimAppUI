@@ -70,6 +70,9 @@ ion-header{
                 }
             }
             .chat{
+                .correctAnswer{
+                    color:orange;
+                }
                 background: #2C3B49;
                 border-radius: 20px;
                 .chatMessage{
