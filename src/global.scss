@@ -50,3 +50,28 @@ ion-content{
         color:white !important;
     }
 }
+.winnerAnno{
+    .alert-wrapper{
+            background:#2C3B49;
+            border:2px solid orange;
+            border-radius: 50px !important;
+            .alert-head{
+                h2{
+                    
+                    color:white;
+                    text-align: center;
+                    text-transform:uppercase;
+                    font-size: 20px;
+                }
+                
+            }
+            .alert-message{
+                color:white;
+                text-transform:uppercase;
+                font-size: 17px;
+            }
+            button{
+                color:white;
+            }
+    }    
+}

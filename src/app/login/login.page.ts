@@ -10,7 +10,7 @@ import { UserService } from '../services/user.service';
 })
 export class LoginPage  {
 
-  constructor(public http:HttpClient,public router:Router,private userService:UserService) { }
+  constructor(public http:HttpClient,public router:Router,public userService:UserService) { }
   
   Login(user,pass){
     this.userService.Login(user,pass).then(x=>{

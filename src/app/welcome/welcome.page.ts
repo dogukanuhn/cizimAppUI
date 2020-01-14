@@ -10,11 +10,12 @@ import { Storage } from '@ionic/storage';
 })
 export class WelcomePage implements OnInit {
 
-  constructor(private userService:UserService,private router:Router,private storage:Storage) { }
+  constructor(public userService:UserService,private router:Router,private storage:Storage) { }
 
   ngOnInit() {
   }
 
+  username;
 
   Login(user : string){
       if(user.length > 3){

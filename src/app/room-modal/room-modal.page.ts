@@ -10,7 +10,7 @@ import { Router } from '@angular/router';
 })
 export class RoomModalPage implements OnInit {
 
-  constructor(public modalController: ModalController, private router: Router, private navParams: NavParams, private room: RoomService) { }
+  constructor(public modalController: ModalController, private router: Router, private navParams: NavParams, public room: RoomService) { }
 
   kickUserName;
   kickUserConId;
@@ -44,6 +44,7 @@ export class RoomModalPage implements OnInit {
 
   closeRoom() {
     this.room.closeRoom().then(x => {
+        this.dismissModal();
       this.room.closeConnections();
       this.router.navigate(['/home']);
     })

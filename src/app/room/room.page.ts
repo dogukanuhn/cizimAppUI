@@ -3,7 +3,7 @@ import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular
 import { ActivatedRoute, Router } from '@angular/router';
 import { SocketService } from '../services/socket.service';
 
-import { ToastController, AlertController, Platform, ModalController } from '@ionic/angular';
+import { ToastController, Platform, ModalController, AlertController } from '@ionic/angular';
 import { UserService } from '../services/user.service';
 import { HttpClient } from '@angular/common/http';
 import { RoomService } from '../services/room.service';
@@ -17,9 +17,9 @@ import { CountdownComponent, CountdownConfig } from 'ngx-countdown';
 })
 export class RoomPage implements AfterViewInit {
 
-  constructor(public modalController: ModalController, private plt: Platform, private room: RoomService, private nav: ActivatedRoute, private router: Router, private http: HttpClient, private socket: SocketService, public toastController: ToastController, private userS: UserService) { }
+  constructor(public modalController: ModalController,private alertController:AlertController, private plt: Platform, public room: RoomService, private nav: ActivatedRoute, private router: Router, private http: HttpClient, public socket: SocketService, public toastController: ToastController, public userS: UserService) { }
 
-
+  messageText;
   @ViewChild('cd', { static: false }) private countdown: CountdownComponent;
   @ViewChild('turnTimer', { static: false }) private turnTime: CountdownComponent;
   timerConfig: CountdownConfig = {
@@ -31,20 +31,20 @@ export class RoomPage implements AfterViewInit {
   turnTimerConfig: CountdownConfig = {
     format: 'mm:ss',
     demand: true,
-    leftTime: 10
+    leftTime: 60
   }
 
-
+  @ViewChild('Canvas', { static: false }) canvasPlayer: any;
   @ViewChild('drawingCanvas', { static: false }) canvas: any;
   canvasElement: any;
-
+  canvasPlayerElement : any;
   saveX: number;
   saveY: number;
 
   drawing = false
-  selectedColor = '#9e2956';
+  selectedColor = '#000000';
 
-  colors = ['#9e2956', '#c2281d', '#de722f'];
+  colors = ['#000000', '#FFFFFF','#ff0f00', '#00ff00','#0002ff','#0090ff','#feff05','#cc6600','#ff6600','#ff3399','#666666','#993399'];
   lineWidth = 5;
   chatMessage = []
   kickList = [];
@@ -53,26 +53,44 @@ export class RoomPage implements AfterViewInit {
   yourTurn = false;
   chatStatus = true;
 
+  hintCount = 0;
+
+  userWon = {
+    username:null,
+    point:null
+  }
   handleTurnTimer(a) {
-    console.log(a);
-    let ctx = this.canvasElement.getContext('2d');
-    ctx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+
+    
     if (a.status === 3 && this.userS.isAdmin) {
       this.nextTurn();
 
     }
   }
   handleStartCountDown(a) {
+    
+    if(a.status === 3){
+      this.startGame();
+    }
+  }
+
+  startGame(){
     this.gameTimerStatus = false;
-    if (a.status === 3 && this.userS.isAdmin) {
-
+    this.isGameStart = true;
+    if (this.userS.isAdmin) {
       this.room.startGame();
-
     }
   }
 
   nextTurn() {
-    this.room.nextTurn()
+    let ctx2 = this.canvasPlayerElement.getContext('2d');
+    ctx2.clearRect(0, 0, this.canvasPlayerElement.width, this.canvasPlayerElement.height);
+
+    let ctx = this.canvasElement.getContext('2d');
+    ctx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+    this.room.nextTurn();
+    
+    
   }
 
   async presentModal() {
@@ -87,12 +105,22 @@ export class RoomPage implements AfterViewInit {
     return await modal.present();
   }
 
+  selectColor(color){
+    this.selectedColor =color;
+  }
+
+
   ngAfterViewInit() {
     this.canvasElement = this.canvas.nativeElement;
     this.canvasElement.width = this.plt.width() + '';
-    this.canvasElement.height = 200;
+    this.canvasElement.height = this.plt.height() - 200 + '';
 
+    this.canvasPlayerElement = this.canvasPlayer.nativeElement;
+    this.canvasPlayerElement.width = this.plt.width() + '';
+    this.canvasPlayerElement.height = 200;
   }
+
+
   startDrawing(ev) {
     if (this.yourTurn) {
       const canvasPosition = this.canvasElement.getBoundingClientRect();
@@ -143,9 +171,9 @@ export class RoomPage implements AfterViewInit {
     console.log(canvasUrl);
     let background = new Image()
     background.src = canvasUrl;
-    let ctx = this.canvasElement.getContext('2d');
+    let ctx = this.canvasPlayerElement.getContext('2d');
     background.onload = x => {
-      ctx.drawImage(background, 0, 0, this.canvasElement.width, this.canvasElement.height);
+      ctx.drawImage(background, 0, 0, this.canvasPlayerElement.width, this.canvasPlayerElement.height);
 
     }
   }
@@ -157,6 +185,25 @@ export class RoomPage implements AfterViewInit {
 
   }
 
+
+
+  giveHint(){
+    if(this.hintCount < 3)
+    this.socket.connection.send("GiveHint",this.hintCount+1,this.room.roomName);
+  }
+
+
+  async presentAlert() {
+    const alert = await this.alertController.create({
+      header: 'Kazanan',
+      subHeader: this.userWon.username,
+      message: this.userWon.username+' Tam Tamına ' + this.userWon.point +' Puan Alarak Kazandı.',
+      cssClass:'winnerAnno',
+      buttons: ['Kapat']
+    });
+
+    await alert.present();
+  }
 
 
   ionViewWillEnter() {
@@ -178,8 +225,25 @@ export class RoomPage implements AfterViewInit {
           this.setBackgroundImage(x);
         })
 
-         
+        this.socket.connection.on("ReceivedHint", x => {
+          this.hintCount = x;
+         })
+
+        this.socket.connection.on("GameEnd", x=>{
+
+            this.isGameStart = false;
+            this.hintCount = 0;
+            this.yourTurn = false;
+
+            this.userWon.username = x.username,
+            this.userWon.username = x.point;
+
+            this.presentAlert();
+
+        })
+
         this.socket.connection.on("GameTurn", x => {
+          this.hintCount = 0;
          this.room.GameTurn = x;
         })
 
@@ -193,7 +257,7 @@ export class RoomPage implements AfterViewInit {
 
         this.socket.connection.on("StartTurnTimer", x => {
           this.turnTime.begin();
-          if (this.turnTime.left < 10) {
+          if (this.turnTime.left < 60) {
             this.turnTime.restart();
             this.turnTime.begin();
           }

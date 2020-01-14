@@ -23,6 +23,9 @@ export class RoomService {
 
   GameTurn = {
     wordName:null,
+    firstHint:null,
+    secondHint:null,
+    thirdHint:null,
     turn:null
   }
 
@@ -158,6 +161,7 @@ export class RoomService {
   }
   
   closeConnections() {
+    this.socket.connection.off("DisableChat")
     this.socket.connection.off("GameWord")
     this.socket.connection.off("YourTurn")
     this.socket.connection.off("StartTurnTimer")

@@ -8,14 +8,17 @@
     <ion-row>
       <ion-col size="8" class="ion-align-self-center">
         <span class="roomName">Oda adı: {{room.roomName}}</span>
+        
       </ion-col>
       <ion-col size="2" class="ion-align-self-center ion-text-right">
-        <span class="time "><countdown #turnTimer [config]="turnTimerConfig" (event)="handleTurnTimer($event)"></countdown></span>
+        <span class="time" [hidden]="!isGameStart">
+          <countdown #turnTimer [config]="turnTimerConfig" (event)="handleTurnTimer($event)"></countdown>
+        </span>
 
       </ion-col>
       <ion-col size="2" class="ion-text-right">
         <span>
-          <ion-icon (click)="leaveRoom()"  class="backButton " name="arrow-back" size="large">
+          <ion-icon (click)="leaveRoom()" class="backButton " name="arrow-back" size="large">
           </ion-icon>
         </span>
       </ion-col>
@@ -27,20 +30,24 @@
 
 <ion-content [forceOverscroll]="false">
   <div class="holder">
-    <div class="holder-inside">
+    <div class="ion-text-center">
+      <countdown [hidden]="!gameTimerStatus" class="gameCountDown" #cd [config]="timerConfig"
+    (event)="handleStartCountDown($event)"></countdown>
+    </div>
+    <div class="holder-inside" [hidden]="yourTurn">
       <div class="word-area ion-text-center ion-margin-top">
-        {{room.GameTurn.wordName}}
-     
+        <span *ngIf="hintCount === 1">{{room.GameTurn.firstHint}}</span>
+        <span *ngIf="hintCount === 2">{{room.GameTurn.secondHint}}</span>
+        <span *ngIf="hintCount === 3">{{room.GameTurn.secondHint}}</span>
       </div>
       <div class="canvas ion-margin-top">
-        <countdown [hidden]="!gameTimerStatus"  class="gameCountDown" #cd [config]="timerConfig"  (event)="handleStartCountDown($event)"></countdown>
-        <canvas #drawingCanvas (touchstart)="startDrawing($event)" (touchend)="endDrawing($event)"
-          (touchmove)="moved($event)" (mousedown)="startDrawing($event)" (mouseup)="endDrawing($event)"
-          (mousemove)="moved($event)"></canvas>
+       
+        <canvas #Canvas></canvas>
 
 
       </div>
       <div class="buttons ion-text-end">
+        <ion-button  (click)="startGame()" *ngIf="!isGameStart && userS.isAdmin"> Oyun Başlat </ion-button>
         <ion-button>
           <ion-icon name="information-circle"></ion-icon>
         </ion-button>
@@ -53,14 +60,14 @@
       </div>
       <div class="main-content">
         <ion-row>
-          <ion-col size="4" >
+          <ion-col size="4">
             <div class="users">
               <ul>
                 <li *ngFor="let item of [1,2,3]"><span class="playerName">Altux</span>
                   <br>Puan:0
                 </li>
 
-              
+
               </ul>
             </div>
           </ion-col>
@@ -69,7 +76,9 @@
               <div class="chatText"><span>Chat</span></div>
               <div class="chatMessage">
                 <ul>
-                  <li *ngFor="let item of chatMessage" [ngClass]="{'correctAnswer': item.answer}">{{item.username}}:{{item.answer ? item.username === userS.userInformation.username ? item.message : '******' : item.message }}</li>
+                  <li *ngFor="let item of chatMessage" [ngClass]="{'correctAnswer': item.answer}">
+                    {{item.username}}:{{item.answer ? item.username === userS.userInformation.username ? item.message : '******' : item.message }}
+                  </li>
 
                 </ul>
               </div>
@@ -83,7 +92,62 @@
         </ion-row>
       </div>
     </div>
+
+    <div class="holder-inside drawingArea" [hidden]="!yourTurn">
+      <div>
+        <ion-button class="ion-float-left" (click)="giveHint()" *ngIf="yourTurn" [disabled]="hintCount === 3">Hint Ver</ion-button>
+        <span class="ion-float-right ion-padding">{{room.GameTurn.wordName}}</span>
+      </div>
+
+      <div class="canvasDrawing">
+        <canvas #drawingCanvas (touchstart)="startDrawing($event)" (touchend)="endDrawing($event)"
+          (touchmove)="moved($event)" (mousedown)="startDrawing($event)" (mouseup)="endDrawing($event)"
+          (mousemove)="moved($event)"></canvas>
+        <ion-row>
+          <ion-col size="6">
+            <ion-row>
+              <ion-col size="12">
+                <ion-range min="2" max="20" color="primary" class="ion-no-padding" [(ngModel)]="lineWidth">
+                  <ion-icon size="small" slot="start" name="brush"></ion-icon>
+                  <ion-icon slot="end" name="brush"></ion-icon>
+
+                </ion-range>
+              </ion-col>
+              <ion-col size="12">
+                <ion-button (click)="nextTurn()">Atla</ion-button>
+              </ion-col>
+            </ion-row>
+
+          </ion-col>
+
+          <ion-col size="6">
+            <ion-row>
+              <ion-col *ngFor="let color of colors" size="2">
+                <div [style.background]="color" class="color-block" tappable (click)="selectColor(color)"></div>
+              </ion-col>
+            </ion-row>
+          </ion-col>
+        </ion-row>
+      </div>
+
+    </div>
   </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   <!-- <div *ngIf="userS.isAdmin">
     <ion-button (click)="closeRoom()">oda kapat</ion-button>
     <ion-button (click)="userList()">kullanıcıları getir</ion-button>
@@ -123,11 +187,11 @@
 </ion-content>
 
 
-<ion-footer>
+<ion-footer [hidden]="yourTurn">
   <!-- <ion-input placeholder="Mesajınız.." [(ngModel)]="messageText"></ion-input>
   <ion-button (click)="room.SendMessage(messageText)">></ion-button> -->
   <ion-item lines="none">
     <ion-input placeholder="Mesajınız.." [(ngModel)]="messageText"></ion-input>
-    <ion-button [disabled]="!chatStatus" (click)="room.SendMessage(messageText)">></ion-button>
+    <ion-button [disabled]="!chatStatus" (click)="room.SendMessage(messageText); messageText=null ">></ion-button>
   </ion-item>
 </ion-footer>

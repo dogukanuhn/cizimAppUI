@@ -2,12 +2,13 @@
     background: white;
     height: 100%;
     border-radius: 50px 50px 0 0;
-
+    padding-top: 15px;
     .holder-inside{
         height: 100%;
         overflow: auto;
         padding: 12px ;
         padding-bottom: 0;
+        padding-top: 0;
         
         .propertiesButton{
             text-transform: capitalize;

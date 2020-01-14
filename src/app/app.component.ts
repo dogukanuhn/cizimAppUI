@@ -6,7 +6,7 @@ import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { UserService } from './services/user.service';
 import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage';
-
+import { ScreenOrientation } from '@ionic-native/screen-orientation/ngx';
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -14,13 +14,10 @@ import { Storage } from '@ionic/storage';
 })
 export class AppComponent {
   constructor(
+    private screenOrientation: ScreenOrientation,
     private platform: Platform,
     private splashScreen: SplashScreen,
-    private statusBar: StatusBar,
-    private userS:UserService,
-    private storage:Storage,
-    private router:Router
-    
+    private statusBar: StatusBar, 
   ) {
 
     this.initializeApp();
@@ -28,12 +25,7 @@ export class AppComponent {
 
   initializeApp() {
     this.platform.ready().then(() => {
-      // this.storage.get("userinfo").then(x=>{
-      //   if(x){
-      //     this.router.navigate(['/home']);
-      //     this.userS.userInformation = x;
-      //   }
-      // })
+      this.screenOrientation.lock(this.screenOrientation.ORIENTATIONS.PORTRAIT);
 
       
     
